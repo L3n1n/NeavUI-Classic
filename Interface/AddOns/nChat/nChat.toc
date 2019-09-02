@@ -1,0 +1,11 @@
+## Interface: 11302
+## Title: |cffCC3333 n|rChat
+## RequiredDeps: !Beautycase
+
+config.lua
+core.lua
+copy.lua
+hyperlink.lua
+urlcopy.lua
+whisper.lua
+invite.lua

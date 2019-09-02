@@ -1,0 +1,10 @@
+## Interface: 11302
+## Title: |cffCC3333 n|rMinimap
+## RequiredDeps: !Beautycase
+
+config.lua
+
+core.lua
+capture.lua
+clock.lua
+tab.lua

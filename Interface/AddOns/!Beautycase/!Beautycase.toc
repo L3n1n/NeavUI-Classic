@@ -1,0 +1,4 @@
+## Interface: 11302
+## Title: !Beautycase
+
+core.lua
