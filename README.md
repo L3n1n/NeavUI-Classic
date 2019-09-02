@@ -1,5 +1,5 @@
 # NeavUI-Classic
-Neav UI for WoW Classic
+Neav UI for WoW Classic.
 
 # Addons included
 * !Beautycase
