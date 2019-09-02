@@ -109,10 +109,10 @@ f.Left:RegisterForClicks('anyup')
 f.Left:RegisterEvent('PLAYER_ENTERING_WORLD')
 f.Left:RegisterEvent('MODIFIER_STATE_CHANGED')
 f.Left:RegisterEvent('PLAYER_GUILD_UPDATE')
-f.Left:RegisterEvent('GUILD_ROSTER_SHOW')
+--f.Left:RegisterEvent('GUILD_ROSTER_SHOW')
 f.Left:RegisterEvent('GUILD_ROSTER_UPDATE')
 f.Left:RegisterEvent('GUILD_MOTD')
-f.Left:RegisterEvent('GUILD_XP_UPDATE')
+--f.Left:RegisterEvent('GUILD_XP_UPDATE')
 
 f.Left.Text = f.Left:CreateFontString(nil, 'OVERLAY')
 f.Left.Text:SetFont('Fonts\\ARIALN.ttf', 12)
@@ -150,9 +150,9 @@ f.Center:RegisterForClicks('anyup')
 f.Center:RegisterEvent('BN_FRIEND_ACCOUNT_ONLINE')
 f.Center:RegisterEvent('BN_FRIEND_ACCOUNT_OFFLINE')
 f.Center:RegisterEvent('BN_FRIEND_INFO_CHANGED')
-f.Center:RegisterEvent('BN_FRIEND_TOON_ONLINE')
-f.Center:RegisterEvent('BN_FRIEND_TOON_OFFLINE')
-f.Center:RegisterEvent('BN_TOON_NAME_UPDATED')
+--f.Center:RegisterEvent('BN_FRIEND_TOON_ONLINE')
+--f.Center:RegisterEvent('BN_FRIEND_TOON_OFFLINE')
+--f.Center:RegisterEvent('BN_TOON_NAME_UPDATED')
 f.Center:RegisterEvent('FRIENDLIST_UPDATE')
 f.Center:RegisterEvent('PLAYER_ENTERING_WORLD')
 
@@ -361,16 +361,6 @@ local function BuildGuildTable()
     end)
 end
 
-local function UpdateGuildXP()
-    local currentXP, remainingXP, dailyXP, maxDailyXP = UnitGetGuildXP('player')
-    local nextLevelXP = currentXP + remainingXP
-    local percentTotal = tostring(ceil((currentXP / nextLevelXP) * 100))
-    local percentDaily = tostring(ceil((dailyXP / maxDailyXP) * 100))
-
-    guildXP[0] = { currentXP, nextLevelXP, percentTotal }
-    guildXP[1] = { dailyXP, maxDailyXP, percentDaily }
-end
-
 local function GuildTip(self)
     if (not IsInGuild()) then
         return 
@@ -382,27 +372,11 @@ local function GuildTip(self)
     local zonec, classc, levelc
     local online = totalGuildOnline
 
-    GameTooltip:AddLine(GetGuildInfo('player')..' - '..LEVEL..' '..GetGuildLevel())
+    GameTooltip:AddLine(GetGuildInfo('player'))
     GameTooltip:AddLine(' ')
     GameTooltip:AddLine(GUILD_MOTD, nil, nil, nil) 
     GameTooltip:AddLine(GetGuildRosterMOTD() or '-', 1, 1, 1, true) 
     GameTooltip:AddLine(' ')
-
-    if (GetGuildLevel() ~= 25) then
-        local currentXP, nextLevelXP, percentTotal = unpack(guildXP[0])
-        local dailyXP, maxDailyXP, percentDaily = unpack(guildXP[1])
-        GameTooltip:AddLine(format(col..GUILD_EXPERIENCE_CURRENT, '|r |cFFFFFFFF'..ShortValue(currentXP), ShortValue(nextLevelXP), percentTotal))
-        GameTooltip:AddLine(format(col..GUILD_EXPERIENCE_DAILY, '|r |cFFFFFFFF'..ShortValue(dailyXP), ShortValue(maxDailyXP), percentDaily))
-    end
-
-    local _, _, standingID, min, max, curr = GetGuildFactionInfo()
-    if (standingID ~= 4) then
-        max = max - min
-        curr = curr - min
-        min = 0
-        GameTooltip:AddLine(COMBAT_FACTION_CHANGE)
-        GameTooltip:AddLine(format('|cFFFFFFFF%s/%s (%s%%)', ShortValue(curr), ShortValue(max), ceil((curr / max) * 100)))
-    end
 
     GameTooltip:AddLine(' ')
     GameTooltip:AddLine(GUILD_ONLINE_LABEL)
@@ -454,7 +428,6 @@ end
 local function UpdateGuildText()
     if (IsInGuild()) then
         BuildGuildTable()
-        UpdateGuildXP() 
 
         f.Left.Text:SetFormattedText(format('%s|cffffffff%d|r', guildIcon, (totalGuildOnline == 1 and 0) or totalGuildOnline))
     else
@@ -486,10 +459,9 @@ f.Left:SetScript('OnClick', function(self, button)
             LoadAddOn('Blizzard_GuildUI') 
         end
 
-        GuildFrame_Toggle() 
+        FriendsFrameTab3:Click()
     else
         GameTooltip:Hide()
-        UpdateGuildXP() 
 
         local classc, levelc, grouped
         local menuCountWhispers = 0
@@ -604,6 +576,7 @@ local function BuildBNTable(total)
 
     for i = 1, total do
         local presenceID, givenName, surname, toonName, toonID, client, isOnline, _, isAFK, isDND, _, noteText = BNGetFriendInfo(i)
+        --local _, _, _, realmName, faction, _, race, class, _, zoneName, level = BNGetToonInfo(presenceID)
         local _, _, _, realmName, faction, _, race, class, _, zoneName, level = BNGetToonInfo(presenceID)
 
         for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do 
@@ -773,7 +746,7 @@ f.Center:SetScript('OnClick', function(self, button)
 end)
 
 local function FriendsOnEvent(self, event)
-    if (event == 'BN_FRIEND_INFO_CHANGED' or event == 'BN_FRIEND_ACCOUNT_ONLINE' or event == 'BN_FRIEND_ACCOUNT_OFFLINE' or event == 'BN_TOON_NAME_UPDATED' or event == 'BN_FRIEND_TOON_ONLINE' or event == 'BN_FRIEND_TOON_OFFLINE' or event == 'PLAYER_ENTERING_WORLD') then
+    if (event == 'BN_FRIEND_INFO_CHANGED' or event == 'BN_FRIEND_ACCOUNT_ONLINE' or event == 'BN_FRIEND_ACCOUNT_OFFLINE' or event == 'PLAYER_ENTERING_WORLD') then
         local BNTotal = BNGetNumFriends()
 
         if (BNTotal == #BNTable) then
