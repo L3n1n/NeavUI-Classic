@@ -18,6 +18,7 @@ f:SetScript("OnEvent", function(self, event, name)
 			TimeManagerClockTicker:SetTextColor(classColor.r, classColor.g, classColor.b)
 			TimeManagerClockTicker:SetPoint("TOPRIGHT", TimeManagerClockButton, 0, 0)
 
+			MinimapToggleButton:Hide()
 			TimeManagerClockButton:GetRegions():Hide()
 			TimeManagerClockButton:ClearAllPoints()
 			TimeManagerClockButton:SetWidth(40)
