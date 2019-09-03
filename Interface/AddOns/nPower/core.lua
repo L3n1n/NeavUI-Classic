@@ -2,15 +2,6 @@
 local ComboColor = nPower.energy.comboColor
 local playerClass = select(2, UnitClass('player'))
 
-local RuneColor = {
-    [1] = {r = 0.7, g = 0.1, b = 0.1},
-    [2] = {r = 0.7, g = 0.1, b = 0.1},
-    [3] = {r = 0.4, g = 0.8, b = 0.2},
-    [4] = {r = 0.4, g = 0.8, b = 0.2},
-    [5] = {r = 0.0, g = 0.6, b = 0.8},
-    [6] = {r = 0.0, g = 0.6, b = 0.8},
-}
-
 local f = CreateFrame('Frame', nil, UIParent)
 f:SetScale(1.4)
 f:SetSize(18, 18)
@@ -23,10 +14,6 @@ f:RegisterEvent('PLAYER_ENTERING_WORLD')
 --f:RegisterEvent('UNIT_COMBO_POINTS')
 f:RegisterEvent('UNIT_POWER_UPDATE')
 f:RegisterEvent('PLAYER_TARGET_CHANGED')
-
-if (nPower.rune.showRuneCooldown) then
-    f:RegisterEvent('RUNE_TYPE_UPDATE')
-end
 
 -- f:RegisterEvent('UNIT_DISPLAYPOWER')
 -- f:RegisterEvent('UNIT_POWER')
@@ -71,37 +58,6 @@ if (playerClass == 'WARLOCK' and nPower.showSoulshards or playerClass == 'PALADI
 
     f.extraPoints:SetParent(f)
     f.extraPoints:SetPoint('CENTER', 0, 0)
-end
-
-if (playerClass == 'DEATHKNIGHT' and nPower.rune.showRuneCooldown) then
-    for i = 1, 6 do 
-        RuneFrame:UnregisterAllEvents()
-        _G['RuneButtonIndividual'..i]:Hide()
-    end
-
-    f.Rune = {}
-
-    for i = 1, 6 do
-        f.Rune[i] = f:CreateFontString(nil, 'ARTWORK')
-
-        if (nPower.rune.runeFontOutline) then
-            f.Rune[i]:SetFont(nPower.rune.runeFont, nPower.rune.runeFontSize, 'THINOUTLINE')
-            f.Rune[i]:SetShadowOffset(0, 0)
-        else
-            f.Rune[i]:SetFont(nPower.rune.runeFont, nPower.rune.runeFontSize)
-            f.Rune[i]:SetShadowOffset(1, -1)
-        end
-
-        f.Rune[i]:SetShadowOffset(0, 0)
-        f.Rune[i]:SetParent(f)
-    end
-
-    f.Rune[1]:SetPoint('CENTER', -65, 0)
-    f.Rune[2]:SetPoint('CENTER', -39, 0)
-    f.Rune[3]:SetPoint('CENTER', 39, 0)
-    f.Rune[4]:SetPoint('CENTER', 65, 0)
-    f.Rune[5]:SetPoint('CENTER', -13, 0)
-    f.Rune[6]:SetPoint('CENTER', 13, 0)
 end
 
 f.Power = CreateFrame('StatusBar', nil, UIParent)
@@ -201,30 +157,10 @@ local function SetComboAlpha(i)
     end
 end
 
-local function CalcRuneCooldown(self)
-    local start, duration, runeReady = GetRuneCooldown(self)
-    local time = floor(GetTime() - start)
-    local cooldown = ceil(duration - time)
-
-    if (runeReady or UnitIsDeadOrGhost('player')) then
-        return '#'
-    elseif (not UnitIsDeadOrGhost('player') and cooldown) then
-        return cooldown
-    end
-end
-
-local function SetRuneColor(i)
-    if (f.Rune[i].type == 4) then
-        return 1, 0, 1
-    else
-        return RuneColor[i].r, RuneColor[i].g, RuneColor[i].b
-    end
-end
-
 local function UpdateBarVisibility()
     local _, powerType = UnitPowerType('player')
 
-    if ((not nPower.energy.show and powerType == 'ENERGY') or (not nPower.focus.show and powerType == 'FOCUS') or (not nPower.rage.show and powerType == 'RAGE') or (not nPower.mana.show and powerType == 'MANA') or (not nPower.rune.show and powerType == 'RUNEPOWER') or UnitIsDeadOrGhost('player')) then
+    if ((not nPower.energy.show and powerType == 'ENERGY') or (not nPower.focus.show and powerType == 'FOCUS') or (not nPower.rage.show and powerType == 'RAGE') or (not nPower.mana.show and powerType == 'MANA') or UnitIsDeadOrGhost('player')) then
         f.Power:SetAlpha(0)
     elseif (InCombatLockdown()) then
         securecall('UIFrameFadeIn', f.Power, 0.3, f.Power:GetAlpha(), nPower.activeAlpha)
@@ -288,10 +224,6 @@ f:SetScript('OnEvent', function(self, event, arg1)
         end
     end
 
-    if (event == 'RUNE_TYPE_UPDATE' and nPower.rune.showRuneCooldown) then
-        f.Rune[arg1].type = GetRuneType(arg1)
-    end
-
     --[[
     UpdateBar()
     UpdateBarVisibility()
@@ -321,23 +253,6 @@ f:SetScript('OnUpdate', function(self, elapsed)
     if (updateTimer > 0.1) then
         if (f.mpreg) then
             f.mpreg:SetText(GetRealMpFive())
-        end
-
-        if (f.Rune) then
-            for i = 1, 6 do
-                if (UnitHasVehicleUI('player')) then
-                    if (f.Rune[i]:IsShown()) then
-                        f.Rune[i]:Hide()
-                    end
-                else
-                    if (not f.Rune[i]:IsShown()) then
-                        f.Rune[i]:Show()
-                    end
-                end
-
-                f.Rune[i]:SetText(CalcRuneCooldown(i))
-                f.Rune[i]:SetTextColor(SetRuneColor(i))
-            end
         end
 
         if (f.extraPoints) then
