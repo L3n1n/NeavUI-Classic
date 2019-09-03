@@ -1,70 +1,89 @@
 ﻿
-local classColor = RAID_CLASS_COLORS[select(2, UnitClass('player'))]
+local _, nMinimap = ...
+local cfg = nMinimap.Config
 
-MinimapToggleButton:Hide()
+local unpack = unpack
+local sort = table.sort
+local sort_func = function( a,b ) return a.name < b.name end
 
---Hide Minimap Clock
-local mm = CreateFrame("Frame", "DejaMinimapFrame")
+local classColor = RAID_CLASS_COLORS[select(2, UnitClass("player"))]
 
-	mm:RegisterEvent("PLAYER_LOGIN")
-	mm:RegisterEvent("PLAYER_ENTERING_WORLD")
-	mm:RegisterEvent("ADDON_LOADED")
-	mm:RegisterEvent("UPDATE_INSTANCE_INFO")
+local f = CreateFrame("Frame", nil, UIParent)
+f:RegisterEvent("ADDON_LOADED")
+f:SetScript("OnEvent", function(self, event, name)
+    if name == "Blizzard_TimeManager" then
+		local function CreateNewClock()
+			TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 15, "OUTLINE")
+			TimeManagerClockTicker:SetShadowOffset(0, 0)
+			TimeManagerClockTicker:SetTextColor(classColor.r, classColor.g, classColor.b)
+			TimeManagerClockTicker:SetPoint("TOPRIGHT", TimeManagerClockButton, 0, 0)
 
-local function eventHandler(self, event, ...)
-	for i = 1, 1 do
-		if TimeManagerClockButton then
-			TimeManagerClockButton:SetAlpha(0)
+			TimeManagerClockButton:GetRegions():Hide()
+			TimeManagerClockButton:ClearAllPoints()
+			TimeManagerClockButton:SetWidth(40)
+			TimeManagerClockButton:SetHeight(18)
+			TimeManagerClockButton:SetPoint("BOTTOM", Minimap, 0, 2)
+
+			TimeManagerAlarmFiredTexture:SetTexture(nil)
+			
+			hooksecurefunc(TimeManagerAlarmFiredTexture, "Show", function()
+				TimeManagerClockTicker:SetTextColor(1, 0, 1)
+			end)
+
+			hooksecurefunc(TimeManagerAlarmFiredTexture, "Hide", function()
+				TimeManagerClockTicker:SetTextColor(classColor.r, classColor.g, classColor.b)
+			end)
+
+			-- Add lockouts to time tooltip.
+
+			local instanceLockouts = {}
+			local worldbossLockouts = {}
+
+			TimeManagerClockButton:SetScript("OnEnter" ,function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+
+				-- Add default time info.
+				GameTime_UpdateTooltip()
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine(GAMETIME_TOOLTIP_TOGGLE_CLOCK)
+
+				-- Raid Lockout Info
+				local savedInstances = GetNumSavedInstances()
+				if savedInstances > 0 then
+					for index=1, savedInstances do
+						local instanceName, _, _, _, locked, _, _, isRaid, _, difficultyName, maxBosses, defeatedBosses = GetSavedInstanceInfo(index)
+
+						if locked then
+							instanceLockouts[index] = { name = instanceName, difficulty = difficultyName, defeated = defeatedBosses, total = maxBosses }
+						end
+					end
+
+					if next(instanceLockouts) ~= nil then
+						sort(instanceLockouts, sort_func)
+
+						GameTooltip:AddLine(" ")
+						GameTooltip:AddLine(CALENDAR_FILTER_RAID_LOCKOUTS)
+
+						for i, saved in ipairs(instanceLockouts) do
+							local bossColor = saved.defeated == saved.total and { 0.0, 1.0, 0.0 } or { 1.0, 0.0, 0.0 }
+							GameTooltip:AddDoubleLine(saved.name .. " |cffffffff" .. saved.difficulty .. "|r", saved.defeated .. "/" .. saved.total, 1.0, 0.82, 0.0, unpack(bossColor))
+						end
+					end
+
+				end
+
+
+				GameTooltip:Show()
+			end)
+
+			TimeManagerClockButton:SetScript("OnLeave", function(self)
+				wipe(instanceLockouts)
+				wipe(worldbossLockouts)
+				GameTooltip:Hide()
+			end)
+			
 		end
-	end
-end
-
-mm:SetScript("OnEvent",eventHandler)
-
--- Create New Minimap Clock
-
-local use24hformat = true
-
-local mmclock = CreateFrame("Frame", nil, Minimap)
-	mmclock:RegisterEvent("PLAYER_LOGIN")
-	mmclock:RegisterEvent("PLAYER_ENTERING_WORLD")
-	mmclock:RegisterEvent("ADDON_LOADED")
-	mmclock:RegisterEvent("PLAYER_REGEN_DISABLED")
-	mmclock:RegisterEvent("PLAYER_REGEN_ENABLED")
-	mmclock:RegisterEvent("UNIT_COMBAT")
-
-	mmclock:SetFrameStrata("MEDIUM")
-	mmclock:SetFrameLevel("9")
-	mmclock:SetWidth(40)
-	mmclock:SetHeight(18)
-	mmclock:SetPoint("BOTTOM", Minimap, "BOTTOM", 0, 5)
-	mmclock:Show()
-
-local clockFS = mmclock:CreateFontString("FontString","OVERLAY","GameTooltipText")
-
-	clockFS:SetPoint("BOTTOM",mmclock,"BOTTOM",0,0)
-
-local elapsed = 0
-	mmclock:SetScript("OnUpdate", function(self, e)
-	   elapsed = elapsed + e
-	   if elapsed >= 1 then
-		   MinimapClockRefresh()
-		   elapsed = 0
-	   end
+        CreateNewClock()
+        TimeManagerClockButton:SetScript("OnShow", CreateNewClock)
+    end
 end)
-
-	mmclock:SetScript("OnEvent", function()
-		clockFS:SetTextColor(1, 1, 1);
-		MinimapClockRefresh()
-	end)
-	
-function MinimapClockRefresh()
-	clockFS:SetFont('Fonts\\ARIALN.ttf', 15, 'OUTLINE')
-	if use24hformat then
-		clockFS:SetText(date("%H:%M"))
-	else
-		clockFS:SetText(("%d:%s"):format(tonumber(date("%I")),((date("%M%p")))))
-	end
-	clockFS:SetTextColor(classColor.r, classColor.g, classColor.b)
-	clockFS:SetShadowOffset(0, 0)
-end
