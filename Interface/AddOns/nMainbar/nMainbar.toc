@@ -9,6 +9,7 @@ modules\bags.lua
 modules\core.lua
 modules\bottomLeft.lua
 modules\bottomRight.lua
+modules\extrabar.lua
 modules\left.lua
 modules\right.lua
 modules\skins.lua

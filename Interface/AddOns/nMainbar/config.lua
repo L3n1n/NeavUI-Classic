@@ -104,6 +104,12 @@ nMainbar.Config = {
         orderVertical = false,
         verticalPosition = 'LEFT', -- 'LEFT' or 'RIGHT'
     },
+	
+	extraBar = {
+        enabled = false,
+		mouseover = false,
+		alpha = 1,
+    },
 
     totemManager = {
         scale = 1,

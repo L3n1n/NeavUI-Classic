@@ -5,7 +5,7 @@ local cfg = nMainbar.Config
 local function GetNumShapeSlots()
     local _, class = UnitClass('Player')
     
-    if (class == 'DEATHKNIGHT' or class == 'WARRIOR') then
+    if (class == 'WARRIOR') then
         return 3
     elseif (class == 'ROGUE' or class == 'PRIEST') then
         return 1
@@ -75,4 +75,8 @@ end
 
 if (cfg.stanceBar.mouseover) then
     EnableMouseOver('ShapeshiftButton', ShapeshiftBarFrame, 1, GetNumShapeSlots(), cfg.stanceBar.alpha)
+end
+
+if (cfg.extraBar.mouseover) then
+	EnableMouseOver('ExtraBarButton', MainMenuBarExtraBar, 1, 12, cfg.multiBarBottomLeft.alpha)
 end
