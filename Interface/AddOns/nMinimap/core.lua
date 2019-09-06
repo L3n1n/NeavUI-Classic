@@ -58,6 +58,8 @@ MinimapBorderTop:Hide()
 
 MinimapZoneText:Hide()
 
+GameTimeFrame:Hide()
+
 MinimapZoneTextButton:Hide()
 MinimapZoneTextButton:UnregisterAllEvents()
 
@@ -86,9 +88,11 @@ Minimap:SetMaskTexture("Interface\\ChatFrame\\ChatFrameBackground")
 Minimap:CreateBeautyBorder(11)
 Minimap:SetBeautyBorderPadding(1)
 
-local classColor = RAID_CLASS_COLORS[select(2, UnitClass('player'))]
-Minimap:SetBeautyBorderTexture("white")
-Minimap:SetBeautyBorderColor(classColor.r, classColor.g, classColor.b)
+if (cfg.classColor.border) then
+	local classColor = RAID_CLASS_COLORS[select(2, UnitClass('player'))]
+	Minimap:SetBeautyBorderTexture("white")
+	Minimap:SetBeautyBorderColor(classColor.r, classColor.g, classColor.b)
+end
 
     -- Enable mousewheel zooming
 

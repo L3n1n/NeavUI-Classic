@@ -12,6 +12,10 @@ nMinimap.Config = {
         showMinimapMouseover = true,
         showBelowMinimap = false,
     },
+	
+	classColor = {
+		border = true,
+	},
 
     mouseover = {
         zoneText = true,
