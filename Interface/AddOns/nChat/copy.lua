@@ -60,9 +60,9 @@ local function CopyChat(chat)
 
     if container:IsShown() then
         if cfg.showInputBoxAbove then
-            local editBox = _G[chat:GetName().."EditBox"]
-            container:SetPoint("BOTTOMLEFT", editBox, "TOPLEFT", 3, 10)
-            container:SetPoint("BOTTOMRIGHT", editBox, "TOPRIGHT", -3, 10)
+            local editBoxHeight = _G[chat:GetName().."EditBox"]:GetHeight()
+            container:SetPoint("BOTTOMLEFT", chat, "TOPLEFT", 3, editBoxHeight + 10)
+            container:SetPoint("BOTTOMRIGHT", chat, "TOPRIGHT", -3, editBoxHeight + 10)
         else
             local tabHeight = _G[chat:GetName().."Tab"]:GetHeight()
             container:SetPoint("BOTTOMLEFT", chat, "TOPLEFT", 0, tabHeight + 10)
