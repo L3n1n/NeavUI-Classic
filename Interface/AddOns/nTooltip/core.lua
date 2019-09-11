@@ -315,11 +315,15 @@ GameTooltip:HookScript("OnTooltipSetUnit", function(self, ...)
 
         GameTooltipTextLeft1:SetText(name)
 
-            -- Color guildnames
+            -- Guildnames
 
         if GetGuildInfo(unit) then
+			local default = GameTooltipTextLeft2:GetText()
+			GameTooltipTextLeft2:SetText(select(1, GetGuildInfo(unit)))
+			self:AddLine(default, 1, 1, 1)
+				-- Color guildnames
             if GetGuildInfo(unit) == GetGuildInfo("player") and IsInGuild("player") then
-               GameTooltipTextLeft2:SetText("|cffFF66CC"..GameTooltipTextLeft2:GetText().."|r")
+				GameTooltipTextLeft2:SetText("|cffFF66CC"..GameTooltipTextLeft2:GetText().."|r")
             end
         end
 
