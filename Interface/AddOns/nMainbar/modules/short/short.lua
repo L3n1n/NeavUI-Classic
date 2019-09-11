@@ -43,6 +43,7 @@ for i = 2, 3 do
         _G['ReputationXPBarTexture'..i],
 
         _G['MainMenuBarPageNumber'],
+		_G['MainMenuBarPerformanceBarFrameButton'],
 
         _G['SlidingActionBarTexture0'],
         _G['SlidingActionBarTexture1'],
