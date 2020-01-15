@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 11303
 ## Title: |cffCC3333 n|rBuff
 
 config.lua
